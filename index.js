@@ -66,7 +66,7 @@ var MandrillAdapter = mandrillOptions => {
       if (mandrillOptions.verificationTemplateName) {
         mandrill_client.messages.sendTemplate(
           {
-            template_name: mandrillOptions.verificationTemplateName,
+            template_name: mandrillOptions.verificationTemplateName instanceof Function ? mandrillOptions.verificationTemplateName(options) : mandrillOptions.verificationTemplateName,
             template_content: [],
             message: message,
             async: true
@@ -120,7 +120,7 @@ var MandrillAdapter = mandrillOptions => {
       if (mandrillOptions.passwordResetTemplateName) {
         mandrill_client.messages.sendTemplate(
           {
-            template_name: mandrillOptions.passwordResetTemplateName,
+            template_name: mandrillOptions.verificationTemplateName instanceof Function ? mandrillOptions.passwordResetTemplateName(options) : mandrillOptions.passwordResetTemplateName,
             template_content: [],
             message: message,
             async: true
