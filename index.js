@@ -23,6 +23,7 @@ var MandrillAdapter = mandrillOptions => {
       mandrillOptions.verificationBody ||
       'Hi,\n\nYou are being asked to confirm the e-mail address *|email|* ' +
       'with *|appname|*\n\nClick here to confirm it:\n*|link|*';
+  mandrillOptions.verificationMessage = mandrillOptions.verificationMessage || {};
   mandrillOptions.passwordResetSubject =
       mandrillOptions.passwordResetSubject ||
       'Password Reset Request for *|appname|*';
@@ -30,7 +31,9 @@ var MandrillAdapter = mandrillOptions => {
       mandrillOptions.passwordResetBody ||
       'Hi,\n\nYou requested a password reset for *|appname|*.\n\nClick here ' +
       'to reset it:\n*|link|*';
+  mandrillOptions.passwordResetMessage = mandrillOptions.passwordResetMessage || {};
   mandrillOptions.customUserAttributesMergeTags = mandrillOptions.customUserAttributesMergeTags || [];
+
 
   var mandrill_client = new mandrill.Mandrill(mandrillOptions.apiKey);
 
@@ -48,7 +51,7 @@ var MandrillAdapter = mandrillOptions => {
       }
     }
 
-    var message = {
+    var message = Object.assign({
       from_email: mandrillOptions.fromEmail,
       from_name: mandrillOptions.displayName,
       headers: {
@@ -57,10 +60,10 @@ var MandrillAdapter = mandrillOptions => {
       to: [{
         email: options.user.get("email")
       }],
-      subject: mandrillOptions.verificationSubject,
+      subject: mandrillOptions.verificationSubject instanceof Function ? mandrillOptions.verificationSubject(options) : mandrillOptions.verificationSubject,
       text: mandrillOptions.verificationBody,
       global_merge_vars: global_merge_vars
-    }
+    }, mandrillOptions.verificationMessage)
 
     return new Promise((resolve, reject) => {
       if (mandrillOptions.verificationTemplateName) {
@@ -102,7 +105,7 @@ var MandrillAdapter = mandrillOptions => {
       }
     }
     
-    var message = {
+    var message = Object.assign({
       from_email: mandrillOptions.fromEmail,
       from_name: mandrillOptions.displayName,
       headers: {
@@ -111,16 +114,16 @@ var MandrillAdapter = mandrillOptions => {
       to: [{
         email: options.user.get("email") || options.user.get("username")
       }],
-      subject: mandrillOptions.passwordResetSubject,
+      subject: mandrillOptions.passwordResetSubject instanceof Function ? mandrillOptions.passwordResetSubject(options) : mandrillOptions.passwordResetSubject,
       text: mandrillOptions.passwordResetBody,
       global_merge_vars: global_merge_vars
-    }
+    }, mandrillOptions.passwordResetMessage)
 
     return new Promise((resolve, reject) => {
       if (mandrillOptions.passwordResetTemplateName) {
         mandrill_client.messages.sendTemplate(
           {
-            template_name: mandrillOptions.verificationTemplateName instanceof Function ? mandrillOptions.passwordResetTemplateName(options) : mandrillOptions.passwordResetTemplateName,
+            template_name: mandrillOptions.passwordResetTemplateName instanceof Function ? mandrillOptions.passwordResetTemplateName(options) : mandrillOptions.passwordResetTemplateName,
             template_content: [],
             message: message,
             async: true
