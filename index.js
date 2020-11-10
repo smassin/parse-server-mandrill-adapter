@@ -65,6 +65,12 @@ var MandrillAdapter = mandrillOptions => {
       global_merge_vars: global_merge_vars
     }, mandrillOptions.verificationMessage)
 
+    if(mandrillOptions.messageId instanceof Function) {
+      var messageId = mandrillOptions.messageId();
+      message.headers['Message-ID'] = [messageId]
+      message.headers['References'] = [messageId]
+    }
+
     return new Promise((resolve, reject) => {
       if (mandrillOptions.verificationTemplateName) {
         mandrill_client.messages.sendTemplate(
@@ -119,6 +125,12 @@ var MandrillAdapter = mandrillOptions => {
       global_merge_vars: global_merge_vars
     }, mandrillOptions.passwordResetMessage)
 
+    if(mandrillOptions.messageId instanceof Function) {
+      var messageId = mandrillOptions.messageId();
+      message.headers['Message-ID'] = [messageId]
+      message.headers['References'] = [messageId]
+    }
+
     return new Promise((resolve, reject) => {
       if (mandrillOptions.passwordResetTemplateName) {
         mandrill_client.messages.sendTemplate(
@@ -156,6 +168,12 @@ var MandrillAdapter = mandrillOptions => {
       }],
       subject: options.subject,
       text: options.text
+    }
+
+    if(mandrillOptions.messageId instanceof Function) {
+      var messageId = mandrillOptions.messageId();
+      message.headers['Message-ID'] = [messageId]
+      message.headers['References'] = [messageId]
     }
 
     return new Promise((resolve, reject) => {
